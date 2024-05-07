@@ -6,6 +6,8 @@
 
 ## Train Data
 ### test data by kaggle
-https://www.kaggle.com/datasets/aashita/nyt-comments
+https://www.kaggle.com/datasets/aashita/nyt-comments  
 
-### crawling text data from NEWS
+### open source library for scrapping news data.
+https://github.com/kimminsum/korean-news-scraper  
+
