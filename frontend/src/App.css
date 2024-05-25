@@ -9,10 +9,10 @@
     margin-left: 250px; 
 }
 
-
 .content {
+    text-align: center;
     flex-grow: 1;
     margin-top: 80px;
-    padding: 40px;
+    padding: 50px;
     transition: margin-left 0.3s ease;
 }

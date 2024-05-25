@@ -5,10 +5,8 @@ const Contact: React.FC = () => {
     return (
         <section id="contact">
             <h2>Contact Us</h2>
-            <p>
-                If you have any questions, please reach out to us at
-                contact@mysimplehomepage.com.
-            </p>
+            <p>현재 작동되는 프로그램 깃허브 주소입니다.</p>
+            <a href="https://github.com/kimminsum/MinGPT.git">깃허브 주소</a>
         </section>
     );
 };

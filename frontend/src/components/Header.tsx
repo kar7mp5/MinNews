@@ -9,13 +9,15 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isOpen, toggleSidebar }) => {
     return (
-        <header className={styles.header}>
+        <header
+            className={`${styles.header}
+                ${isOpen ? styles.headerTextOpen : styles.headerTextClose}
+            }`}
+        >
             <button className={styles.toggleButton} onClick={toggleSidebar}>
                 {isOpen ? <> </> : <FaBars className={styles.sidebarToggle} />}
             </button>
-            <h1 className={isOpen ? styles.headerTextOpen : ''}>
-                My Simple Homepage
-            </h1>
+            <h1>MinNews</h1>
         </header>
     );
 };
