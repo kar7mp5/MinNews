@@ -1,0 +1,31 @@
+/* Header.module.css */
+.header {
+    background-color: #282c34;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+    transition: margin-left 0.3s ease;
+}
+
+.headerTextOpen {
+    transition: padding-left 0.3s ease;
+    padding-left: 20px;
+}
+
+.sidebarToggle {
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.toggleButton {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+}

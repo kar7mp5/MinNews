@@ -1,0 +1,18 @@
+.App {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.App.sidebar-open {
+    margin-left: 250px; 
+}
+
+
+.content {
+    flex-grow: 1;
+    margin-top: 80px;
+    padding: 40px;
+    transition: margin-left 0.3s ease;
+}
