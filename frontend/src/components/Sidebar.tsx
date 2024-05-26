@@ -16,7 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <nav>
                 <ul className={styles.menu}>
                     <li>
-                        <a href="#home">Home</a>
+                        <a href="#problem">Problem</a>
                     </li>
                     <li>
                         <a href="#about">About</a>

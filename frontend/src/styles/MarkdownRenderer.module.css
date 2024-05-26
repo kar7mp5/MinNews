@@ -1,0 +1,7 @@
+/* Google Fonts import */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+
+.markdown {
+    margin-top: 2rem;
+    font-family: 'Ubuntu', sans-serif;
+}
