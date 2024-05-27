@@ -1,5 +1,5 @@
 # read_csv.py
-import csv
+import pandas as pd
 import os
 
 def read_csv(path: str, article_num: int) -> list:
@@ -7,7 +7,7 @@ def read_csv(path: str, article_num: int) -> list:
     read_csv
 
     Args:
-        path (str): absolute csv path
+        path (str): relative csv path
         article_num (int): return article number 
         
     Returns:
@@ -15,12 +15,27 @@ def read_csv(path: str, article_num: int) -> list:
         
         The list length is affected by the number of articles. 
     """
-    path = f"{os.getcwd()}/data/article_links/Iran.csv"
-    with open(path, newline='') as csvfile:
-        lines = csv.reader(csvfile)
-        for row in lines:
-            print(row[1])
+    _path = f"{os.getcwd()}{path}" # convert relative path to absolute path.
+
+    _lines = pd.read_csv(
+                        filepath_or_buffer=_path, 
+                        usecols=["News Links"], 
+                        encoding="utf8"
+                        )
+
+    # check `(param)article_num` over `(param)lines` length.
+    # True for return `(param)lines`
+    # False for return `(param)article_num`
+    print(_lines.__len__())
+    if (article_num > _lines.__len__()):
+            
+        for i in range(_lines.__len__()):
+            print(_lines.values[i][0])
+    else:
+        print(_lines.values)
+        for i in range(article_num):
+            print(_lines.values[i][0])
 
 
 if __name__=="__main__":
-    read_csv()
+    read_csv("/data/article_links/Iran.csv", 2)
