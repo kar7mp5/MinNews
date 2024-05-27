@@ -2,8 +2,8 @@
     display: flex;
     flex-direction: column;
     text-align: center;
-    width: 15.625rem;
-    left: -15.625rem;
+    width: 12.625rem;
+    left: -12.625rem;
 
     position: fixed;
     top: 0;
@@ -17,7 +17,7 @@
 }
 
 .sidebarToggle {
-    margin-left: 11.25rem;
+    margin-left: 8.25rem;
     cursor: pointer;
 }
 
@@ -48,4 +48,9 @@
 .menu li a {
     color: white;
     text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.menu li:hover {
+    background-color: #494949;
 }

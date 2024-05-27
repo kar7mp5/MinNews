@@ -1,14 +1,14 @@
+// src/components/Sidebar.tsx
 import React from 'react';
-import styles from 'styles/Sidebar.module.css';
-import { FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { FaTimes } from 'react-icons/fa';
 
+import styles from 'styles/Sidebar.module.css';
 
 interface SidebarProps {
     isOpen: boolean;
     toggleSidebar: () => void;
 }
-
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     return (
@@ -19,19 +19,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <nav>
                 <ul className={styles.menu}>
                     <li>
-                        <Link to='/'>Home</Link>
+                        <Link to="/">Home</Link>
                     </li>
                     <li>
-                        <Link to='/service'>Service</Link>
+                        <Link to="/service">Service</Link>
                     </li>
                     <li>
-                        <a href="#problem">Problem</a>
-                    </li>
-                    <li>
-                        <a href="#about">About</a>
-                    </li>
-                    <li>
-                        <a href="#contact">Contact</a>
+                        <Link to="/about">About Me</Link>
                     </li>
                 </ul>
             </nav>

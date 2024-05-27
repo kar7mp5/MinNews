@@ -1,0 +1,13 @@
+.link_preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 50%; /* Set a specific width for the link preview container */
+}
+
+.img_container {
+    width: 100%; /* Set the width of the image to 100% of its container */
+    max-width: 100%; /* Ensure the image doesn't exceed its container's width */
+    height: auto; /* Maintain the aspect ratio */
+    word-wrap: break-word; /* Allow long words to be broken and wrap onto the next line */
+}

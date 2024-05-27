@@ -1,5 +1,5 @@
 .header {
-    background-color: #20242a;
+    background-color: #17171c;
     color: white;
     display: flex;
     align-items: center;
@@ -9,7 +9,7 @@
     z-index: 1;
     box-shadow: 0px 0.5rem 0.5rem 0px rgba(0, 0, 0, 0.25);
 
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.5s ease;
 }
 
 .headerTextOpen {
