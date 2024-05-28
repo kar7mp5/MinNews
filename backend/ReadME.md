@@ -6,7 +6,7 @@
 $ pip3 install -r requirements.txt
 ```
   
-**Linux**  
+**2. Run the server**  
 ```bash
 $ fastapi dev server.py
 ```
