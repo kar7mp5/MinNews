@@ -23,18 +23,14 @@ def read_csv(path: str, article_num: int) -> list:
                         encoding="utf8"
                         )
 
+    _links: list = []
     # check `(param)article_num` over `(param)lines` length.
     # True for return `(param)lines`
     # False for return `(param)article_num`
-    print(_lines.__len__())
     if (article_num > _lines.__len__()):
-            
-        for i in range(_lines.__len__()):
-            print(_lines.values[i][0])
+        return [_lines.values[i][0] for i in range(_lines.__len__())]
     else:
-        print(_lines.values)
-        for i in range(article_num):
-            print(_lines.values[i][0])
+        return [_lines.values[i][0] for i in range(article_num)]
 
 
 if __name__=="__main__":
