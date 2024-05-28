@@ -23,3 +23,5 @@ archive.zip
 *~
 .*.sw?
 .cache
+
+*.csv

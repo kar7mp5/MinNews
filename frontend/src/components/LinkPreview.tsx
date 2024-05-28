@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import style from 'styles/LinkPreview.module.css';
+import RequestFailImage from 'assets/Request_Fail.png'; // Import the Request Fail image
 
 interface LinkPreviewProps {
     url: string;
@@ -17,30 +18,34 @@ interface Metadata {
 const LinkPreview: React.FC<LinkPreviewProps> = ({ url }) => {
     const [metadata, setMetadata] = useState<Metadata | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchMetadata = async () => {
             setLoading(true);
-            setError(null);
 
             try {
+                // axios 요청을 보내서 메타데이터 가져오기
                 const response = await axios.get(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
-                const { title, description, image } = response.data.data;
+                const { data } = response;
 
-                if (!title || !description || !image?.url) {
-                    setError('Failed to fetch complete metadata');
-                } else {
-                    setMetadata({
-                        title,
-                        description,
-                        image: image.url,
-                        url,
-                    });
+                if (!data || !data.title || !data.description || !data.image) {
+                    throw new Error('Failed to fetch complete metadata');
                 }
-            } catch (err) {
+
+                setMetadata({
+                    title: data.title,
+                    description: data.description,
+                    image: data.image.url,
+                    url,
+                });
+            } catch (err: unknown) {
                 console.error('Error fetching metadata:', err);
-                setError('Failed to fetch metadata');
+                setMetadata({
+                    title: url,
+                    description: '',
+                    image: RequestFailImage, // Use the Request Fail image
+                    url,
+                });
             } finally {
                 setLoading(false);
             }
@@ -49,8 +54,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url }) => {
         fetchMetadata();
     }, [url]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
+    if (loading) return <div className={style.loading}>Loading...</div>;
 
     return (
         metadata && (
