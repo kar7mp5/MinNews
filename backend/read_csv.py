@@ -25,8 +25,8 @@ def read_csv(path: str, article_num: int) -> list:
                         )
 
     # check `(param)article_num` over `(param)lines` length.
-    # True for return `(param)lines`
-    # False for return `(param)article_num`
+    # True : return `(param)lines`
+    # False: return `(param)article_num`
     if (article_num > _lines.__len__()):
         return [_lines.values[i][0] for i in range(_lines.__len__())]
     else:
