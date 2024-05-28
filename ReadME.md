@@ -1,13 +1,38 @@
-# Notion NPL Project
+# Service
+Author: MinSup Kim(Kar7mp5)  
 
-## Algorithm
-- RNN
-- LSTM
+Inha Univ 2024-1  
+Computational Thinking and Data Analytics for Beginners Final Report.
 
-## Train Data
-### test data by kaggle
-https://www.kaggle.com/datasets/aashita/nyt-comments  
+### File Structure
+```
+├── frontend
+│   └── src
+│       ├── assets     # image files
+│       ├── components # components
+│       ├── pages      # page components
+│       ├── styles     # css files
+|       └── ReadME.md  # description; way to start frontend server
+├── backend
+└── study                  # study for making the LLM model
+    ├── model              # saved models in here
+    ├── bert_summary.ipynb # Main LLM model (we use this LLM)
+    ├── text_summary.ipynb # Main text summary model
+    └── ReadME.md          # About test data
+```
 
-### open source library for scrapping news data.
-https://github.com/kimminsum/korean-news-scraper  
+### Quick Start
+About quick start description  
 
+- **Frontend**
+Go to `/frontend/ReadME.md`
+
+- **Backend**
+Go to `/backend/ReadME.md`
+
+### Tech Stack
+| Role | Framework | Language |
+|:---:|:---:|:---:|
+| Front-End | React | TypeScript |
+| Back-End | FastAPI | Python |
+| AI(LLM) | Pytorch | Python |

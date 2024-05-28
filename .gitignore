@@ -1,6 +1,0 @@
-# data
-*.csv
-
-# virtual environment
-/venv/
-/model/
