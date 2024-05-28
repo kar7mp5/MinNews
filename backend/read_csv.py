@@ -2,6 +2,7 @@
 import pandas as pd
 import os
 
+
 def read_csv(path: str, article_num: int) -> list:
     """\
     read_csv
@@ -23,7 +24,6 @@ def read_csv(path: str, article_num: int) -> list:
                         encoding="utf8"
                         )
 
-    _links: list = []
     # check `(param)article_num` over `(param)lines` length.
     # True for return `(param)lines`
     # False for return `(param)article_num`
