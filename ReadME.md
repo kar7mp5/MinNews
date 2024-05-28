@@ -24,10 +24,10 @@ Computational Thinking and Data Analytics for Beginners Final Report.
 ### Quick Start
 About quick start description  
 
-- **Frontend**
+- **Frontend**  
 Go to `/frontend/ReadME.md`
 
-- **Backend**
+- **Backend**  
 Go to `/backend/ReadME.md`
 
 ### Tech Stack
