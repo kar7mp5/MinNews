@@ -1,4 +1,4 @@
-# Service
+# News Title Summary Service
 Author: MinSup Kim(Kar7mp5)  
 
 Inha Univ 2024-1  
