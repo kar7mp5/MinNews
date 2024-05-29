@@ -4,6 +4,7 @@ import os
 import requests
 from concurrent.futures import ThreadPoolExecutor
 
+
 def resolve_url(url: str, timeout: float = 30) -> str:
     """Resolve URL asynchronously.
 

@@ -3,13 +3,19 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
+# /get_news/
+import korean_news_scraper as kns
+from read_csv import read_csv
+import os
+
+# /metadata/
 import requests
 from bs4 import BeautifulSoup
 
-import korean_news_scraper as kns
+# /minGPT/
+# LLM library
+from minGPT import*
 
-from read_csv import read_csv
-import os
 
 
 app = FastAPI()
@@ -21,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class Keyword(BaseModel):
     keyword: str
     number: int
@@ -28,8 +35,7 @@ class Keyword(BaseModel):
 # /service
 @app.post("/get_news")
 async def get_news(data: Keyword) -> dict:
-    """/
-    get news; run on /service
+    """get news; run on /service
     
     Args:
         keyword (str): keyword; search for news
@@ -60,7 +66,7 @@ async def get_news(data: Keyword) -> dict:
     else:
         # File does not exist, save article links to CSV file
         kns.save_article_links([data.keyword], "data", lang="ko-KR")
-
+    
     # get articles links.
     result: list = read_csv(f"/data/article_links/{data.keyword}.csv", data.number)
 
@@ -78,8 +84,7 @@ class Metadata(BaseModel):
 
 @app.get("/metadata")
 async def get_metadata(url: str) -> Metadata:
-    """
-    Fetch metadata for a given URL.
+    """Fetch metadata for a given URL.
     
     Args:
         url (str): The URL for which metadata is to be fetched.
@@ -114,7 +119,11 @@ async def get_metadata(url: str) -> Metadata:
 
         # Return the extracted metadata
         return Metadata(title=title_content, description=description_content, image=image_content, url=url)
+    
     except Exception as e:
         # If any error occurs during metadata extraction, return default values
         print(f"Error fetching metadata for URL: {url}. Error: {str(e)}")
+
         return Metadata(title="", description="", image="", url=url)
+
+

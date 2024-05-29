@@ -1,5 +1,7 @@
+# server
 fastapi>=0.111.0
 
+# korean-news-scraper
 korean-news-scraper>=0.1.5
 beautifulsoup4>=4.12.3
 selenium>=4.18.1
@@ -8,4 +10,8 @@ requests>=2.31.0
 tqdm>=4.66.2
 lxml>=5.2.2
 
-aiohttp>=3.9.5
+# transformer
+tiktoken>=0.1.0
+torch>=1.9.0
+torchvision>=0.10.0
+numpy>=1.21.0
