@@ -3,6 +3,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
+import requests
+from bs4 import BeautifulSoup
+
 import korean_news_scraper as kns
 
 from read_csv import read_csv
@@ -64,3 +67,54 @@ async def get_news(data: Keyword) -> dict:
     return {
             "links": result
             }
+
+
+class Metadata(BaseModel):
+    title: str
+    description: str
+    image: str
+    url: str
+
+
+@app.get("/metadata")
+async def get_metadata(url: str) -> Metadata:
+    """
+    Fetch metadata for a given URL.
+    
+    Args:
+        url (str): The URL for which metadata is to be fetched.
+    
+    Returns:
+        Metadata: The metadata extracted from the URL.
+    """
+
+    try:
+        # Fetch HTML content of the URL
+        response = requests.get(url)
+        html_content = response.content
+
+        # Parse HTML content
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Extract metadata
+        title = soup.find('meta', property='og:title')
+        description = soup.find('meta', property='og:description')
+        image = soup.find('meta', property='og:image')
+
+        # Initialize metadata fields with empty strings
+        title_content = description_content = image_content = ""
+
+        # Assign content to metadata fields if found in the HTML
+        if title:
+            title_content = title.get('content')
+        if description:
+            description_content = description.get('content')
+        if image:
+            image_content = image.get('content')
+
+        # Return the extracted metadata
+        return Metadata(title=title_content, description=description_content, image=image_content, url=url)
+    except Exception as e:
+        # If any error occurs during metadata extraction, return default values
+        print(f"Error fetching metadata for URL: {url}. Error: {str(e)}")
+        return Metadata(title="", description="", image="", url=url)

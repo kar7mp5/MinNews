@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import axios, { AxiosResponse } from 'axios';
 
 import style from 'styles/LinkPreview.module.css';
 import RequestFailImage from 'assets/Request_Fail.png'; // Import the Request Fail image
@@ -24,26 +24,18 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url }) => {
             setLoading(true);
 
             try {
-                // axios 요청을 보내서 메타데이터 가져오기
-                const response = await axios.get(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
-                const { data } = response;
+                // Fetch metadata from the backend endpoint
+                const response: AxiosResponse<Metadata> = await axios.get(`http://localhost:8000/metadata?url=${encodeURIComponent(url)}`);
+                const responseData: Metadata = response.data;
 
-                if (!data || !data.title || !data.description || !data.image) {
-                    throw new Error('Failed to fetch complete metadata');
-                }
-
-                setMetadata({
-                    title: data.title,
-                    description: data.description,
-                    image: data.image.url,
-                    url,
-                });
-            } catch (err: unknown) {
+                setMetadata(responseData);
+            } catch (err) {
                 console.error('Error fetching metadata:', err);
+                // If an error occurs, set default metadata
                 setMetadata({
                     title: url,
                     description: '',
-                    image: RequestFailImage, // Use the Request Fail image
+                    image: RequestFailImage,
                     url,
                 });
             } finally {
@@ -52,7 +44,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url }) => {
         };
 
         fetchMetadata();
-    }, [url]);
+    }, [url]); // Dependency array with 'url'
 
     if (loading) return <div className={style.loading}>Loading...</div>;
 
