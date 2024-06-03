@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 # LLM library
 from minGPT import*
 
+import csv
 
 
 app = FastAPI()
@@ -69,10 +70,12 @@ async def get_news(data: Keyword) -> dict:
     
     # get articles links.
     result: list = read_csv(f"/data/article_links/{data.keyword}.csv", data.number)
-
+    
     return {
             "links": result
             }
+
+
 
 
 class Metadata(BaseModel):
@@ -127,3 +130,47 @@ async def get_metadata(url: str) -> Metadata:
         return Metadata(title="", description="", image="", url=url)
 
 
+
+
+class ArticleSummary(BaseModel):
+    summary: str
+
+
+from googletrans import Translator
+translator = Translator()
+
+
+
+# /summarize_article
+@app.post("/summarize_article")
+async def summarize_article(PROMPT: str) -> ArticleSummary:
+    """Summarize the article at the given URL.
+
+    Args:
+        url (str): The URL of the article to summarize.
+
+    Returns:
+        ArticleSummary: The summary of the article.
+    """
+    kns.extract_article_content("data")
+    directory = f"{os.getcwd()}/data/article_contents/"
+    file_list = os.listdir(directory)
+
+    data = []
+    for file_name in file_list:
+        file_path = os.path.join(directory, file_name)
+        with open(file_path, newline='', encoding='utf-8') as csvfile:
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                data.append(row)
+
+    for file in file_list:
+        os.remove(os.path.join(directory, file))
+
+    links_dir = f"{os.getcwd()}/data/article_links/"
+    for file in os.listdir(links_dir):
+        os.remove(os.path.join(links_dir, file))
+
+
+
+    return ArticleSummary(summary='')

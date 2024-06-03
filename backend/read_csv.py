@@ -26,7 +26,6 @@ def resolve_url(url: str, timeout: float = 30) -> str:
         return url  # Return original URL in case of other request exceptions
 
 
-
 def read_csv(path: str, article_num: int) -> list:
     """Read CSV file and resolve URLs asynchronously.
 

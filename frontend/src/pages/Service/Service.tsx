@@ -14,6 +14,8 @@ const Service: React.FC = () => {
         return storedUrls ? JSON.parse(storedUrls) : [];
     });
     const [loading, setLoading] = useState<boolean>(false);
+    const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+    const [summary, setSummary] = useState<string | null>(null);
 
     useEffect(() => {
         sessionStorage.setItem('keyword', keyword);
@@ -39,7 +41,7 @@ const Service: React.FC = () => {
             const data = await response.json();
             setUrls(data.links);
         } catch (error) {
-            console.error("Failed to fetch URLs:", error);
+            console.error('Failed to fetch URLs:', error);
         } finally {
             setLoading(false);
         }
@@ -48,6 +50,31 @@ const Service: React.FC = () => {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         fetchUrls();
+    };
+
+    const fetchSummary = async (url: string) => {
+        try {
+            setLoading(true);
+            setSelectedUrl(url);
+            const response = await fetch('http://localhost:8000/summarize_article', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setSummary(data.summary);
+        } catch (error) {
+            console.error('Failed to fetch summary:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -75,7 +102,16 @@ const Service: React.FC = () => {
                 <div>Loading...</div>
             ) : (
                 urls.map((url, index) => (
-                    <LinkPreview key={index} url={url} />
+                    <div key={index}>
+                        <LinkPreview url={url} />
+                        <button onClick={() => fetchSummary(url)}>Summarize</button>
+                        {selectedUrl === url && summary && (
+                            <div className={style.summary}>
+                                <h3>Summary:</h3>
+                                <p>{summary}</p>
+                            </div>
+                        )}
+                    </div>
                 ))
             )}
         </main>

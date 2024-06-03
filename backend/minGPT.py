@@ -45,24 +45,11 @@ class GPTDatasetV1(Dataset):
         return self.input_ids[idx], self.target_ids[idx]
 
 
-def create_dataloader_v1(txt, batch_size=4, max_length=256, stride=128, shuffle=True, drop_last=True):
-    """Creates a DataLoader for the GPTDatasetV1.
-
-    Args:
-        txt (str): The input text to be tokenized.
-        batch_size (int): The batch size for the DataLoader.
-        max_length (int): The maximum length of the input sequences.
-        stride (int): The stride size for creating overlapping sequences.
-        shuffle (bool): Whether to shuffle the data.
-        drop_last (bool): Whether to drop the last incomplete batch.
-
-    Returns:
-        DataLoader: The DataLoader for the GPTDatasetV1.
-    """
+def create_dataloader_v1(prompts, batch_size=4, max_length=256, stride=128, shuffle=True, drop_last=True):
     tokenizer = tiktoken.get_encoding("gpt2")
-    dataset = GPTDatasetV1(txt, tokenizer, max_length, stride)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
-    return dataloader
+    combined_text = " ".join(prompts)  # Combine list of texts into a single string
+    dataset = GPTDatasetV1(combined_text, tokenizer, max_length, stride)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
 
 
 class MultiHeadAttention(nn.Module):
@@ -268,7 +255,10 @@ class GPTModel(nn.Module):
         logits = self.out_head(x)
 
         return logits
-
+    
+    
+    
+    
 
 def generate_text(model, idx, max_new_tokens, context_size):
     """
@@ -283,15 +273,57 @@ def generate_text(model, idx, max_new_tokens, context_size):
     Returns:
         torch.Tensor: The generated sequence of token indices.
     """
-    for _ in range(max_new_tokens):
-        idx_cond = idx[:, -context_size:]
-        with torch.no_grad():
+    model.eval()
+    with torch.no_grad():
+        for _ in range(max_new_tokens):
+            idx_cond = idx[:, -context_size:]
             logits = model(idx_cond)
-        logits = logits[:, -1, :]
-        idx_next = torch.argmax(logits, dim=-1, keepdim=True)
-        idx = torch.cat((idx, idx_next), dim=1)
+            logits = logits[:, -1, :]
+            idx_next = torch.argmax(logits, dim=-1, keepdim=True)
+            idx = torch.cat((idx, idx_next), dim=1)
     return idx
 
+
+def get_text(model, device, PROMPT):
+    tokenizer = tiktoken.get_encoding("gpt2")
+    encoded = tokenizer.encode(PROMPT)
+    encoded_tensor = torch.tensor(encoded).unsqueeze(0).to(device)
+
+    print(f"\n{'='*50}\n{' '*22}IN\n{'='*50}")
+    print("\nInput text:", PROMPT)
+    print("Encoded input text:", encoded)
+    print("encoded_tensor.shape:", encoded_tensor.shape)
+
+    out = generate_text(
+        model=model,
+        idx=encoded_tensor,
+        max_new_tokens=50,
+        context_size=GPT_CONFIG_124M["context_length"]
+    )
+    decoded_text = tokenizer.decode(out.squeeze(0).tolist())
+
+    # print(f"\n\n{'='*50}\n{' '*22}OUT\n{'='*50}")
+    # print("\nOutput:", out)
+    # print("Output length:", len(out[0]))
+    # print("Output text:", decoded_text)
+    
+    return decoded_text
+
+def generate_prompt(example):
+    """
+    Generate prompts and responses from the given example dataset.
+
+    Args:
+        example (dict): The dataset containing 'instruction' and 'output' keys.
+
+    Returns:
+        list: List of generated prompt strings.
+    """
+    output_texts = []
+    for i in range(len(example['instruction'])):
+        prompt = f"### Instruction: {example['instruction'][i]}\n\n### Response: {example['output'][i]}<eos>"
+        output_texts.append(prompt)
+    return output_texts
 
 def train_model(model, dataloader, optimizer, criterion, num_epochs, device):
     """
@@ -324,7 +356,25 @@ def train_model(model, dataloader, optimizer, criterion, num_epochs, device):
         print(f'Epoch {epoch + 1}, Loss: {avg_loss}')
 
 
-def main():
+def train(model, device, train_data):
+    prompts = generate_prompt(train_data)
+    print(prompts)
+    dataloader = create_dataloader_v1(prompts, batch_size=10, max_length=256, stride=128, shuffle=False, drop_last=False)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.AdamW(model.parameters(), lr=5e-5)
+    num_epochs = 50
+    train_model(model, dataloader, optimizer, criterion, num_epochs, device)
+
+
+
+def process_output(output_text):
+    processed_output = output_text.split('<eos>')[0].strip()
+    return processed_output
+
+
+
+if __name__ == "__main__":
     GPT_CONFIG_124M = {
         "vocab_size": 50257,
         "context_length": 1024,
@@ -340,41 +390,37 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
-    trian_txt = ("Your training text data goes here. Make sure the text is long enough "
-           "to create multiple samples for training. The length of the text should "
-           "be significantly longer than the max_length parameter to generate enough "
-           "training samples.")
+    example_data = {
+        'instruction': [
+            "Explain the bubble sort algorithm.",
+            "Provide a summary of the binary search algorithm.",
+            "Summarize the quicksort algorithm.",
+            "Give an overview of the breadth-first search algorithm.",
+            "Explain the depth-first search algorithm.",
+            "Summarize the merge sort algorithm.",
+            "Provide a brief description of the insertion sort algorithm.",
+            "Give an overview of the Dijkstra's algorithm for shortest path.",
+            "Explain the A* search algorithm.",
+            "Summarize the Floyd-Warshall algorithm for all-pairs shortest paths."
+        ],
+        'output': [
+            "Bubble sort is a simple sorting algorithm that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.",
+            "Binary search is an efficient algorithm for finding the position of a target value within a sorted array.",
+            "Quicksort is a fast sorting algorithm that divides an array into smaller sub-arrays based on a chosen pivot element.",
+            "Breadth-first search explores all the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.",
+            "Depth-first search explores as far as possible along each branch before backtracking.",
+            "Merge sort is a divide and conquer algorithm that divides the input array into two halves, recursively sorts the halves, and then merges them.",
+            "Insertion sort is a simple sorting algorithm that builds the final sorted array one item at a time.",
+            "Dijkstra's algorithm finds the shortest path between nodes in a graph by iteratively selecting the node with the shortest distance from the source node.",
+            "A* search is a graph traversal and path search algorithm that finds the shortest path between a start node and an end node.",
+            "The Floyd-Warshall algorithm is used to find the shortest paths between all pairs of vertices in a weighted graph."
+        ]
+    }
+    train(model, device, example_data)
 
-    dataloader = create_dataloader_v1(trian_txt, batch_size=4, max_length=256, stride=128, shuffle=False, drop_last=False)
+    PROMPT = 'Explain the bubble sort algorithm'
+    formatted_prompt = f"### Instruction: {PROMPT}\n\n### Response:"
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.AdamW(model.parameters(), lr=5e-5)
-    num_epochs = 50
-    train_model(model, dataloader, optimizer, criterion, num_epochs, device)
-
-    PROMPT = "Your training text"
-    tokenizer = tiktoken.get_encoding("gpt2")
-    encoded = tokenizer.encode(PROMPT)
-    encoded_tensor = torch.tensor(encoded).unsqueeze(0).to(device)
-
-    print(f"\n{50*'='}\n{22*' '}IN\n{50*'='}")
-    print("\nInput text:", PROMPT)
-    print("Encoded input text:", encoded)
-    print("encoded_tensor.shape:", encoded_tensor.shape)
-
-    out = generate_text(
-        model=model,
-        idx=encoded_tensor,
-        max_new_tokens=50,
-        context_size=GPT_CONFIG_124M["context_length"]
-    )
-    decoded_text = tokenizer.decode(out.squeeze(0).tolist())
-
-    print(f"\n\n{50*'='}\n{22*' '}OUT\n{50*'='}")
-    print("\nOutput:", out)
-    print("Output length:", len(out[0]))
-    print("Output text:", decoded_text)
-
-
-if __name__ == "__main__":
-    main()
+    output_text = get_text(model, device, formatted_prompt)
+    processed_output_text = process_output(output_text)
+    print(processed_output_text)
