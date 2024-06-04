@@ -259,8 +259,7 @@ class GPTModel(nn.Module):
     
     
     
-
-def generate_text(model, idx, max_new_tokens, context_size):
+def generate_text(model, idx, max_new_tokens, context_size, tokenizer):
     """
     Generate text using a trained GPT model.
 
@@ -279,7 +278,10 @@ def generate_text(model, idx, max_new_tokens, context_size):
             idx_cond = idx[:, -context_size:]
             logits = model(idx_cond)
             logits = logits[:, -1, :]
-            idx_next = torch.argmax(logits, dim=-1, keepdim=True)
+            idx_next = torch.argmax(logits, dim=-1, keepdim=True)   
+            # Check for the end-of-sequence token and break if found
+            if idx_next.squeeze().item() == tokenizer.encode('<eos>')[0]:
+                break
             idx = torch.cat((idx, idx_next), dim=1)
     return idx
 
@@ -297,17 +299,24 @@ def get_text(model, device, PROMPT):
     out = generate_text(
         model=model,
         idx=encoded_tensor,
-        max_new_tokens=50,
-        context_size=GPT_CONFIG_124M["context_length"]
+        max_new_tokens=400,
+        context_size=GPT_CONFIG_124M["context_length"],
+        tokenizer=tokenizer
     )
     decoded_text = tokenizer.decode(out.squeeze(0).tolist())
+
+    # Print the text only up to the end-of-sequence token
+    eos_pos = decoded_text.find('<eos>')
+    if eos_pos != -1:
+        decoded_text = decoded_text[:eos_pos]
 
     # print(f"\n\n{'='*50}\n{' '*22}OUT\n{'='*50}")
     # print("\nOutput:", out)
     # print("Output length:", len(out[0]))
     # print("Output text:", decoded_text)
-    
+
     return decoded_text
+
 
 def generate_prompt(example):
     """
@@ -324,6 +333,7 @@ def generate_prompt(example):
         prompt = f"### Instruction: {example['instruction'][i]}\n\n### Response: {example['output'][i]}<eos>"
         output_texts.append(prompt)
     return output_texts
+
 
 def train_model(model, dataloader, optimizer, criterion, num_epochs, device):
     """
@@ -363,7 +373,7 @@ def train(model, device, train_data):
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=5e-5)
-    num_epochs = 50
+    num_epochs = 200
     train_model(model, dataloader, optimizer, criterion, num_epochs, device)
 
 
@@ -371,6 +381,7 @@ def train(model, device, train_data):
 def process_output(output_text):
     processed_output = output_text.split('<eos>')[0].strip()
     return processed_output
+
 
 
 
@@ -385,42 +396,124 @@ if __name__ == "__main__":
         "qkv_bias": False
     }
 
-    torch.manual_seed(120)
+    torch.manual_seed(0)
     model = GPTModel(GPT_CONFIG_124M)
+    print(f"GPU? {torch.cuda.is_available()}")
+    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
     example_data = {
         'instruction': [
-            "Explain the bubble sort algorithm.",
-            "Provide a summary of the binary search algorithm.",
-            "Summarize the quicksort algorithm.",
-            "Give an overview of the breadth-first search algorithm.",
-            "Explain the depth-first search algorithm.",
-            "Summarize the merge sort algorithm.",
-            "Provide a brief description of the insertion sort algorithm.",
-            "Give an overview of the Dijkstra's algorithm for shortest path.",
-            "Explain the A* search algorithm.",
-            "Summarize the Floyd-Warshall algorithm for all-pairs shortest paths."
+            "Hello?",
+            "Nice to meet you!",
+            "Hi there?",
+            "Nice to meet you!",
+            "Hello, how can I help you today?",
+            "Hey!",
+            "Good to see you!",
+            "Greetings!",
+            "Pleasure to meet you!",
+            "How are you?",
+            "Hi!",
+            "Lovely to meet you!",
+            "Hey there!",
+            "Nice meeting you!",
+            "Hello, what's new?",
+            "Hey, how's it going?",
+            "Hi, how can I assist you?",
+            "Greetings and salutations!",
+            "Nice to see you!",
+            "Hello, how are you doing?",
+            "Hey, what's up?",
+            "Good day!",
+            "Nice to make your acquaintance!",
+            "Hello, how may I help you?",
+            "Hey, nice to meet you!",
+            "Hi, how are things?",
+            "Greetings, how can I assist you?",
+            "Nice to greet you!",
+            "Hello, how's everything?",
+            "Hey, how can I assist you today?",
+            "Hi, nice to see you!",
+            "Greetings, what's new?",
+            "Hello, how have you been?",
+            "Hey, how can I help you now?",
+            "Hi, it's good to see you!",
+            "Greetings, how are you today?",
+            "Nice to meet you, how can I assist?",
+            "Hello, what's going on?",
+            "Hey, how can I be of service?",
+            "Hi, nice to meet you again!",
+            "Greetings, how are things going?",
+            "Hello, how can I assist you today?",
+            "Hey, what's new with you?",
+            "Hi, how can I help you now?",
+            "Greetings, nice to see you!",
+            "Hello, how have you been lately?"
         ],
         'output': [
-            "Bubble sort is a simple sorting algorithm that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.",
-            "Binary search is an efficient algorithm for finding the position of a target value within a sorted array.",
-            "Quicksort is a fast sorting algorithm that divides an array into smaller sub-arrays based on a chosen pivot element.",
-            "Breadth-first search explores all the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.",
-            "Depth-first search explores as far as possible along each branch before backtracking.",
-            "Merge sort is a divide and conquer algorithm that divides the input array into two halves, recursively sorts the halves, and then merges them.",
-            "Insertion sort is a simple sorting algorithm that builds the final sorted array one item at a time.",
-            "Dijkstra's algorithm finds the shortest path between nodes in a graph by iteratively selecting the node with the shortest distance from the source node.",
-            "A* search is a graph traversal and path search algorithm that finds the shortest path between a start node and an end node.",
-            "The Floyd-Warshall algorithm is used to find the shortest paths between all pairs of vertices in a weighted graph."
+            "Hello?",
+            "Nice to meet you!",
+            "Hi there?",
+            "Nice to meet you!",
+            "Hello, how can I help you today?",
+            "Hey!",
+            "Good to see you!",
+            "Greetings!",
+            "Pleasure to meet you!",
+            "How are you?",
+            "Hi!",
+            "Lovely to meet you!",
+            "Hey there!",
+            "Nice meeting you!",
+            "Hello, what's new?",
+            "Hey, how's it going?",
+            "Hi, how can I assist you?",
+            "Greetings and salutations!",
+            "Nice to see you!",
+            "Hello, how are you doing?",
+            "Hey, what's up?",
+            "Good day!",
+            "Nice to make your acquaintance!",
+            "Hello, how may I help you?",
+            "Hey, nice to meet you!",
+            "Hi, how are things?",
+            "Greetings, how can I assist you?",
+            "Nice to greet you!",
+            "Hello, how's everything?",
+            "Hey, how can I assist you today?",
+            "Hi, nice to see you!",
+            "Greetings, what's new?",
+            "Hello, how have you been?",
+            "Hey, how can I help you now?",
+            "Hi, it's good to see you!",
+            "Greetings, how are you today?",
+            "Nice to meet you, how can I assist?",
+            "Hello, what's going on?",
+            "Hey, how can I be of service?",
+            "Hi, nice to meet you again!",
+            "Greetings, how are things going?",
+            "Hello, how can I assist you today?",
+            "Hey, what's new with you?",
+            "Hi, how can I help you now?",
+            "Greetings, nice to see you!",
+            "Hello, how have you been lately?"
         ]
     }
+
     train(model, device, example_data)
 
-    PROMPT = 'Explain the bubble sort algorithm'
-    formatted_prompt = f"### Instruction: {PROMPT}\n\n### Response:"
 
-    output_text = get_text(model, device, formatted_prompt)
-    processed_output_text = process_output(output_text)
-    print(processed_output_text)
+    while True:
+        user_input = input("입력을 하고 싶으신 내용을 입력해주세요 (종료하려면 'x' 입력): ")
+        
+        if user_input.lower() == 'x':
+            break
+        
+        PROMPT = user_input
+        formatted_prompt = f"### Instruction: {PROMPT}\n\n### Response:"
+
+        output_text = get_text(model, device, formatted_prompt)
+        # processed_output_text = process_output(output_text)
+        print(output_text)
