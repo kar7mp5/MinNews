@@ -369,11 +369,11 @@ def train_model(model, dataloader, optimizer, criterion, num_epochs, device):
 def train(model, device, train_data):
     prompts = generate_prompt(train_data)
     print(prompts)
-    dataloader = create_dataloader_v1(prompts, batch_size=10, max_length=256, stride=128, shuffle=False, drop_last=False)
+    dataloader = create_dataloader_v1(prompts, batch_size=10, max_length=512, stride=128, shuffle=False, drop_last=False)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=5e-5)
-    num_epochs = 200
+    num_epochs = 150
     train_model(model, dataloader, optimizer, criterion, num_epochs, device)
 
 
@@ -405,102 +405,286 @@ if __name__ == "__main__":
 
     example_data = {
         'instruction': [
-            "Hello?",
-            "Nice to meet you!",
-            "Hi there?",
-            "Nice to meet you!",
-            "Hello, how can I help you today?",
-            "Hey!",
-            "Good to see you!",
-            "Greetings!",
-            "Pleasure to meet you!",
-            "How are you?",
-            "Hi!",
-            "Lovely to meet you!",
-            "Hey there!",
-            "Nice meeting you!",
-            "Hello, what's new?",
-            "Hey, how's it going?",
-            "Hi, how can I assist you?",
-            "Greetings and salutations!",
-            "Nice to see you!",
-            "Hello, how are you doing?",
-            "Hey, what's up?",
-            "Good day!",
-            "Nice to make your acquaintance!",
-            "Hello, how may I help you?",
-            "Hey, nice to meet you!",
-            "Hi, how are things?",
-            "Greetings, how can I assist you?",
-            "Nice to greet you!",
-            "Hello, how's everything?",
-            "Hey, how can I assist you today?",
-            "Hi, nice to see you!",
-            "Greetings, what's new?",
-            "Hello, how have you been?",
-            "Hey, how can I help you now?",
-            "Hi, it's good to see you!",
-            "Greetings, how are you today?",
-            "Nice to meet you, how can I assist?",
-            "Hello, what's going on?",
-            "Hey, how can I be of service?",
-            "Hi, nice to meet you again!",
-            "Greetings, how are things going?",
-            "Hello, how can I assist you today?",
-            "Hey, what's new with you?",
-            "Hi, how can I help you now?",
-            "Greetings, nice to see you!",
-            "Hello, how have you been lately?"
+            "Can you explain the BFS algorithm?",
+            "What is the DFS algorithm?",
+            "How does BFS work?",
+            "Can you provide a DFS example?",
+            "What is BFS in graph theory?",
+            "Explain DFS with a code example.",
+            "How to implement BFS in Python?",
+            "Can you write the DFS algorithm in Python?",
+            "What is the difference between BFS and DFS?",
+            "How is BFS used in searching?"
         ],
         'output': [
-            "Hello?",
-            "Nice to meet you!",
-            "Hi there?",
-            "Nice to meet you!",
-            "Hello, how can I help you today?",
-            "Hey!",
-            "Good to see you!",
-            "Greetings!",
-            "Pleasure to meet you!",
-            "How are you?",
-            "Hi!",
-            "Lovely to meet you!",
-            "Hey there!",
-            "Nice meeting you!",
-            "Hello, what's new?",
-            "Hey, how's it going?",
-            "Hi, how can I assist you?",
-            "Greetings and salutations!",
-            "Nice to see you!",
-            "Hello, how are you doing?",
-            "Hey, what's up?",
-            "Good day!",
-            "Nice to make your acquaintance!",
-            "Hello, how may I help you?",
-            "Hey, nice to meet you!",
-            "Hi, how are things?",
-            "Greetings, how can I assist you?",
-            "Nice to greet you!",
-            "Hello, how's everything?",
-            "Hey, how can I assist you today?",
-            "Hi, nice to see you!",
-            "Greetings, what's new?",
-            "Hello, how have you been?",
-            "Hey, how can I help you now?",
-            "Hi, it's good to see you!",
-            "Greetings, how are you today?",
-            "Nice to meet you, how can I assist?",
-            "Hello, what's going on?",
-            "Hey, how can I be of service?",
-            "Hi, nice to meet you again!",
-            "Greetings, how are things going?",
-            "Hello, how can I assist you today?",
-            "Hey, what's new with you?",
-            "Hi, how can I help you now?",
-            "Greetings, nice to see you!",
-            "Hello, how have you been lately?"
+            # BFS Algorithm in Python
+            """
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    result = []
+
+    while queue:
+        vertex = queue.popleft()
+        if vertex not in visited:
+            visited.add(vertex)
+            result.append(vertex)
+            queue.extend(neighbor for neighbor in graph[vertex] if neighbor not in visited)
+    return result
+
+# Example usage:
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+print(bfs(graph, 'A'))  # Output: ['A', 'B', 'C', 'D', 'E', 'F']
+            """,
+
+            # DFS Algorithm in Python
+            """
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    result = [start]
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            result.extend(dfs(graph, neighbor, visited))
+    return result
+
+# Example usage:
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+print(dfs(graph, 'A'))  # Output: ['A', 'B', 'D', 'E', 'F', 'C']
+            """,
+
+            # BFS Implementation in Python
+            """
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    result = []
+
+    while queue:
+        vertex = queue.popleft()
+        if vertex not in visited:
+            visited.add(vertex)
+            result.append(vertex)
+            queue.extend(neighbor for neighbor in graph[vertex] if neighbor not in visited)
+    return result
+
+# Example usage:
+graph = {
+    '1': ['2', '3'],
+    '2': ['1', '4', '5'],
+    '3': ['1', '6', '7'],
+    '4': ['2'],
+    '5': ['2'],
+    '6': ['3'],
+    '7': ['3']
+}
+print(bfs(graph, '1'))  # Output: ['1', '2', '3', '4', '5', '6', '7']
+            """,
+
+            # DFS Implementation in Python
+            """
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    result = [start]
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            result.extend(dfs(graph, neighbor, visited))
+    return result
+
+# Example usage:
+graph = {
+    '1': ['2', '3'],
+    '2': ['1', '4', '5'],
+    '3': ['1', '6', '7'],
+    '4': ['2'],
+    '5': ['2'],
+    '6': ['3'],
+    '7': ['3']
+}
+print(dfs(graph, '1'))  # Output: ['1', '2', '4', '5', '3', '6', '7']
+            """,
+
+            # BFS Example in Python
+            """
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    result = []
+
+    while queue:
+        vertex = queue.popleft()
+        if vertex not in visited:
+            visited.add(vertex)
+            result.append(vertex)
+            queue.extend(neighbor for neighbor in graph[vertex] if neighbor not in visited)
+    return result
+
+# Example usage:
+graph = {
+    'X': ['Y', 'Z'],
+    'Y': ['X', 'W'],
+    'Z': ['X', 'Q'],
+    'W': ['Y'],
+    'Q': ['Z']
+}
+print(bfs(graph, 'X'))  # Output: ['X', 'Y', 'Z', 'W', 'Q']
+            """,
+
+            # DFS Example in Python
+            """
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    result = [start]
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            result.extend(dfs(graph, neighbor, visited))
+    return result
+
+# Example usage:
+graph = {
+    'X': ['Y', 'Z'],
+    'Y': ['X', 'W'],
+    'Z': ['X', 'Q'],
+    'W': ['Y'],
+    'Q': ['Z']
+}
+print(dfs(graph, 'X'))  # Output: ['X', 'Y', 'W', 'Z', 'Q']
+            """,
+
+            # Python Code for BFS
+            """
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    result = []
+
+    while queue:
+        vertex = queue.popleft()
+        if vertex not in visited:
+            visited.add(vertex)
+            result.append(vertex)
+            queue.extend(neighbor for neighbor in graph[vertex] if neighbor not in visited)
+    return result
+
+# Example usage:
+graph = {
+    'M': ['N', 'O'],
+    'N': ['M', 'P'],
+    'O': ['M', 'Q'],
+    'P': ['N'],
+    'Q': ['O']
+}
+print(bfs(graph, 'M'))  # Output: ['M', 'N', 'O', 'P', 'Q']
+            """,
+
+            # Python Code for DFS
+            """
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    result = [start]
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            result.extend(dfs(graph, neighbor, visited))
+    return result
+
+# Example usage:
+graph = {
+    'M': ['N', 'O'],
+    'N': ['M', 'P'],
+    'O': ['M', 'Q'],
+    'P': ['N'],
+    'Q': ['O']
+}
+print(dfs(graph, 'M'))  # Output: ['M', 'N', 'P', 'O', 'Q']
+            """,
+
+            # Implementing BFS in Python
+            """
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    result = []
+
+    while queue:
+        vertex = queue.popleft()
+        if vertex not in visited:
+            visited.add(vertex)
+            result.append(vertex)
+            queue.extend(neighbor for neighbor in graph[vertex] if neighbor not in visited)
+    return result
+
+# Example usage:
+graph = {
+    'R': ['S', 'T'],
+    'S': ['R', 'U'],
+    'T': ['R', 'V'],
+    'U': ['S'],
+    'V': ['T']
+}
+print(bfs(graph, 'R'))  # Output: ['R', 'S', 'T', 'U', 'V']
+            """,
+
+            # Implementing DFS in Python
+            """
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    result = [start]
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            result.extend(dfs(graph, neighbor, visited))
+    return result
+
+# Example usage:
+graph = {
+    'R': ['S', 'T'],
+    'S': ['R', 'U'],
+    'T': ['R', 'V'],
+    'U': ['S'],
+    'V': ['T']
+}
+print(dfs(graph, 'R'))  # Output: ['R', 'S', 'U', 'T', 'V']
+            """
         ]
     }
+
 
     train(model, device, example_data)
 
