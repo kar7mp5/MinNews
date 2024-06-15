@@ -1,19 +1,19 @@
 # server
-fastapi>=0.111.0
+fastapi
 
 # korean-news-scraper
-korean-news-scraper>=0.1.5
-beautifulsoup4>=4.12.3
-selenium>=4.18.1
-pandas>=2.2.1
-requests>=2.31.0
-tqdm>=4.66.2
-lxml>=5.2.2
+korean-news-scraper
+beautifulsoup4
+selenium
+pandas
+requests
+tqdm
+lxml
 
 # transformer
-tiktoken>=0.7.0
-torch>=1.9.0
-torchvision>=0.10.0
-numpy>=1.21.0
-googletrans>=3.0.0
-httpx>=0.23.0
+tiktoken
+torch
+torchvision
+numpy
+googletrans
+httpx
